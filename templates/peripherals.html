@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Периферия{% endblock %}
+{% block content %}
+
+<section class="section" data-filterable>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Оборудование</span>
+      <h2>Периферия</h2>
+      <p>Только топовые устройства от ведущих брендов. Фильтруй по категории.</p>
+    </div>
+
+    <div class="search-box reveal">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" data-search placeholder="Поиск устройства...">
+    </div>
+
+    <div class="filters reveal">
+      <button class="chip active" data-filter="all">Все</button>
+      {% for cat in categories %}
+      <button class="chip" data-filter="{{ cat }}">{{ cat }}</button>
+      {% endfor %}
+    </div>
+
+    <div class="grid grid-3">
+      {% for p in items %}
+      <div class="card peri-card reveal" data-tags="{{ p['category'] }}" data-name="{{ p['name'] }}">
+        <span class="top-line"></span>
+        {% if p['badge'] %}<span class="badge">{{ p['badge'] }}</span>{% endif %}
+        <div class="ic"><i class="fa-solid {{ p['icon'] }}"></i></div>
+        <span class="cat">{{ p['category'] }}</span>
+        <h3 style="margin-top:6px">{{ p['name'] }}</h3>
+        <p>{{ p['descr'] }}</p>
+        {% if p['specs'] %}
+        <div class="specs">
+          {% for s in p['specs'].split('|') %}<span>{{ s }}</span>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="empty-note"><i class="fa-solid fa-ghost"></i> Ничего не найдено</div>
+  </div>
+</section>
+
+{% endblock %}

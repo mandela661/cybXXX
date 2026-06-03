@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Акции{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Выгода</span>
+      <h2>Акции и предложения</h2>
+      <p>Играй больше — плати меньше. Следи за обновлениями.</p>
+    </div>
+    {% if promos %}
+    <div class="grid grid-3">
+      {% for p in promos %}
+      <div class="card promo-card reveal d{{ (loop.index0 % 3) + 1 }}">
+        <span class="top-line"></span>
+        {% if p['discount'] %}<div class="disc">−{{ p['discount'] }}%</div>{% else %}<div class="ic"><i class="fa-solid fa-gift"></i></div>{% endif %}
+        <h3>{{ p['title'] }}</h3>
+        <p>{{ p['descr'] }}</p>
+        <div class="period"><i class="fa-solid fa-clock"></i> {{ p['period'] }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center" style="color:var(--dim)">Активных акций пока нет.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

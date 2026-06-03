@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель{% endblock %}
+{% block content %}
+
+{% set labels = {
+  'site_title':'Название сайта','hero_kicker':'Hero · надпись сверху','hero_title':'Hero · заголовок',
+  'hero_subtitle':'Hero · подзаголовок','about_title':'Блок «О нас» · заголовок','about_text':'Блок «О нас» · текст',
+  'stat_pc':'Статистика · кол-во ПК','stat_hours':'Статистика · режим работы','stat_years':'Статистика · лет на рынке',
+  'stat_players':'Статистика · игроков','contact_phone':'Контакт · телефон','contact_email':'Контакт · email',
+  'contact_address':'Контакт · адрес','contact_hours':'Контакт · часы','social_tg':'Соцсеть · Telegram',
+  'social_vk':'Соцсеть · VK','social_dis':'Соцсеть · Discord',
+  'map_lat':'Карта · широта (lat)','map_lng':'Карта · долгота (lng)','map_zoom':'Карта · зум (1–19)'
+} %}
+
+<section class="section-sm">
+  <div class="container">
+    <div class="cab-head reveal">
+      <div>
+        <span class="text-red" style="font-family:var(--font-display);letter-spacing:3px;font-size:.74rem">ПАНЕЛЬ УПРАВЛЕНИЯ</span>
+        <h2 style="font-size:2rem">Администрирование</h2>
+      </div>
+      <a href="{{ url_for('index') }}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-house"></i> На сайт</a>
+    </div>
+
+    <div class="admin-layout">
+      <!-- сайдбар -->
+      <nav class="admin-side reveal">
+        {% set nav = [
+          ('dashboard','fa-gauge','Дашборд'),('bookings','fa-calendar-check','Бронирования'),
+          ('users','fa-users','Пользователи'),('reviews','fa-star','Отзывы'),
+          ('promos','fa-gift','Акции'),('configs','fa-desktop','Конфигурации'),
+          ('peripherals','fa-keyboard','Периферия'),('games','fa-gamepad','Игры'),
+          ('settings','fa-sliders','Настройки сайта')
+        ] %}
+        {% for key, ic, name in nav %}
+        <a href="?tab={{ key }}" data-tab="{{ key }}" class="{{ 'active' if tab==key }}"><i class="fa-solid {{ ic }}"></i> {{ name }}</a>
+        {% endfor %}
+      </nav>
+
+      <div>
+        <!-- ===== ДАШБОРД ===== -->
+        <div class="admin-panel {{ 'active' if tab=='dashboard' }}" data-panel="dashboard">
+          <div class="stats mb-2">
+            <div class="stat"><div class="num text-red">{{ stats['users'] }}</div><div class="lbl">Пользователей</div></div>
+            <div class="stat"><div class="num text-red">{{ stats['bookings'] }}</div><div class="lbl">Бронирований</div></div>
+            <div class="stat"><div class="num text-red">{{ stats['revenue'] }} ₽</div><div class="lbl">Выручка</div></div>
+            <div class="stat"><div class="num text-red">{{ stats['pending_reviews'] }}</div><div class="lbl">Отзывов на модерации</div></div>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="num">{{ stats['configs'] }}</div><div class="lbl">Конфигураций</div></div>
+            <div class="stat"><div class="num">{{ stats['peripherals'] }}</div><div class="lbl">Периферии</div></div>
+            <div class="stat"><div class="num">{{ stats['games'] }}</div><div class="lbl">Игр</div></div>
+            <div class="stat"><div class="num">{{ stats['promos'] }}</div><div class="lbl">Акций</div></div>
+          </div>
+        </div>
+
+        <!-- ===== БРОНИРОВАНИЯ ===== -->
+        <div class="admin-panel {{ 'active' if tab=='bookings' }}" data-panel="bookings">
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-calendar-check"></i> Бронирования</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Пользователь</th><th>ПК</th><th>Часы</th><th>Сумма</th><th>Статус</th><th>Действия</th></tr></thead>
+                <tbody>
+                  {% for b in bookings %}
+                  <tr>
+                    <td>{{ b['id'] }}</td><td>{{ b['username'] }}</td><td>{{ b['config_name'] }}</td>
+                    <td>{{ b['hours'] }}</td><td>{{ b['total'] }} ₽</td>
+                    <td><span class="status {{ b['status'] }}">{{ b['status'] }}</span></td>
+                    <td><div class="row-actions">
+                      <form class="inline-form" method="post" action="{{ url_for('admin_booking_status', bid=b['id']) }}">
+                        <input type="hidden" name="status" value="done">
+                        <button class="icon-btn" title="Завершить"><i class="fa-solid fa-check"></i></button>
+                      </form>
+                      <form class="inline-form" method="post" action="{{ url_for('admin_booking_status', bid=b['id']) }}">
+                        <input type="hidden" name="status" value="cancelled">
+                        <button class="icon-btn" title="Отменить"><i class="fa-solid fa-ban"></i></button>
+                      </form>
+                      <form class="inline-form" method="post" action="{{ url_for('admin_booking_delete', bid=b['id']) }}">
+                        <button class="icon-btn danger" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                      </form>
+                    </div></td>
+                  </tr>
+                  {% else %}<tr><td colspan="7" style="color:var(--dim)">Нет бронирований</td></tr>{% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ПОЛЬЗОВАТЕЛИ ===== -->
+        <div class="admin-panel {{ 'active' if tab=='users' }}" data-panel="users">
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-users"></i> Пользователи</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Логин</th><th>Email</th><th>Роль</th><th>Баланс</th><th>Действия</th></tr></thead>
+                <tbody>
+                  {% for u in users %}
+                  <tr>
+                    <td>{{ u['id'] }}</td><td>{{ u['username'] }}</td><td>{{ u['email'] }}</td>
+                    <td><span class="status {{ 'new' if u['role']=='admin' else 'done' }}">{{ u['role'] }}</span></td>
+                    <td>{{ u['balance'] }} ₽</td>
+                    <td>
+                      <details class="edit-row"><summary>Изменить</summary>
+                        <form class="edit-box" method="post" action="{{ url_for('admin_user_edit', uid=u['id']) }}">
+                          <div class="form-row">
+                            <div class="field"><label>Роль</label>
+                              <select name="role">
+                                <option value="user"  {{ 'selected' if u['role']=='user' }}>user</option>
+                                <option value="admin" {{ 'selected' if u['role']=='admin' }}>admin</option>
+                              </select>
+                            </div>
+                            <div class="field"><label>Баланс, ₽</label><input type="number" name="balance" value="{{ u['balance'] }}" min="0"></div>
+                          </div>
+                          <div class="field"><label>Телефон</label><input type="text" name="phone" value="{{ u['phone'] or '' }}"></div>
+                          <div class="row-actions">
+                            <button class="btn btn-primary btn-sm">Сохранить</button>
+                          </div>
+                        </form>
+                        <form class="inline-form" method="post" action="{{ url_for('admin_user_delete', uid=u['id']) }}"
+                              onsubmit="return confirm('Удалить пользователя {{ u['username'] }}?')">
+                          <button class="btn btn-ghost btn-sm" style="margin-top:8px"><i class="fa-solid fa-trash"></i> Удалить</button>
+                        </form>
+                      </details>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ОТЗЫВЫ ===== -->
+        <div class="admin-panel {{ 'active' if tab=='reviews' }}" data-panel="reviews">
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-star"></i> Модерация отзывов</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Автор</th><th>Оценка</th><th>Текст</th><th>Статус</th><th>Действия</th></tr></thead>
+                <tbody>
+                  {% for r in all_reviews %}
+                  <tr>
+                    <td>{{ r['author'] }}</td><td>{{ r['rating'] }} ★</td><td style="max-width:340px">{{ r['text'] }}</td>
+                    <td><span class="status {{ 'done' if r['approved'] else 'new' }}">{{ 'одобрен' if r['approved'] else 'ожидает' }}</span></td>
+                    <td><div class="row-actions">
+                      {% if not r['approved'] %}
+                      <form class="inline-form" method="post" action="{{ url_for('admin_review_approve', rid=r['id']) }}">
+                        <button class="icon-btn" title="Одобрить"><i class="fa-solid fa-check"></i></button>
+                      </form>
+                      {% endif %}
+                      <form class="inline-form" method="post" action="{{ url_for('admin_review_delete', rid=r['id']) }}">
+                        <button class="icon-btn danger" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                      </form>
+                    </div></td>
+                  </tr>
+                  {% else %}<tr><td colspan="5" style="color:var(--dim)">Нет отзывов</td></tr>{% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== АКЦИИ ===== -->
+        <div class="admin-panel {{ 'active' if tab=='promos' }}" data-panel="promos">
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-plus"></i> Новая акция</h3>
+            <form method="post" action="{{ url_for('admin_promo_add') }}">
+              <div class="form-row">
+                <div class="field"><label>Заголовок</label><input name="title" required></div>
+                <div class="field"><label>Период</label><input name="period" placeholder="Будни 9:00–17:00"></div>
+              </div>
+              <div class="field"><label>Описание</label><textarea name="descr"></textarea></div>
+              <div class="form-row">
+                <div class="field"><label>Скидка, %</label><input type="number" name="discount" min="0" max="100" value="0"></div>
+              </div>
+              <button class="btn btn-primary btn-sm">Добавить</button>
+            </form>
+          </div>
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-gift"></i> Все акции</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Заголовок</th><th>Скидка</th><th>Период</th><th>Активна</th><th>Действия</th></tr></thead>
+                <tbody>
+                  {% for p in all_promos %}
+                  <tr>
+                    <td>{{ p['title'] }}</td><td>{{ p['discount'] }}%</td><td>{{ p['period'] }}</td>
+                    <td><span class="status {{ 'new' if p['active'] else 'cancelled' }}">{{ 'да' if p['active'] else 'нет' }}</span></td>
+                    <td><div class="row-actions">
+                      <form class="inline-form" method="post" action="{{ url_for('admin_promo_toggle', pid=p['id']) }}">
+                        <button class="icon-btn" title="Вкл/выкл"><i class="fa-solid fa-power-off"></i></button>
+                      </form>
+                      <form class="inline-form" method="post" action="{{ url_for('admin_promo_delete', pid=p['id']) }}">
+                        <button class="icon-btn danger" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                      </form>
+                    </div>
+                    <details class="edit-row"><summary>Изменить</summary>
+                      <form class="edit-box" method="post" action="{{ url_for('admin_promo_edit', pid=p['id']) }}">
+                        <div class="field"><label>Заголовок</label><input name="title" value="{{ p['title'] }}"></div>
+                        <div class="field"><label>Описание</label><textarea name="descr">{{ p['descr'] }}</textarea></div>
+                        <div class="form-row">
+                          <div class="field"><label>Скидка, %</label><input type="number" name="discount" value="{{ p['discount'] }}"></div>
+                          <div class="field"><label>Период</label><input name="period" value="{{ p['period'] }}"></div>
+                        </div>
+                        <button class="btn btn-primary btn-sm">Сохранить</button>
+                      </form>
+                    </details>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== КОНФИГУРАЦИИ ===== -->
+        <div class="admin-panel {{ 'active' if tab=='configs' }}" data-panel="configs">
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-plus"></i> Новая конфигурация</h3>
+            <form method="post" action="{{ url_for('admin_config_add') }}">
+              <div class="form-row">
+                <div class="field"><label>Название</label><input name="name" required></div>
+                <div class="field"><label>Тег</label><input name="tag" placeholder="PRO"></div>
+                <div class="field"><label>Цена, ₽/час</label><input type="number" name="price" min="0" required></div>
+                <div class="field"><label>Иконка (Font Awesome)</label><input name="icon" placeholder="fa-desktop"></div>
+                <div class="field"><label>CPU</label><input name="cpu"></div>
+                <div class="field"><label>GPU</label><input name="gpu"></div>
+                <div class="field"><label>RAM</label><input name="ram"></div>
+                <div class="field"><label>Накопитель</label><input name="storage"></div>
+              </div>
+              <button class="btn btn-primary btn-sm">Добавить</button>
+            </form>
+          </div>
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-desktop"></i> Конфигурации</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Название</th><th>Тег</th><th>Цена</th><th>GPU</th><th>Действия</th></tr></thead>
+                <tbody>
+                  {% for c in configs %}
+                  <tr>
+                    <td>{{ c['name'] }}</td><td>{{ c['tag'] }}</td><td>{{ c['price'] }} ₽</td><td>{{ c['gpu'] }}</td>
+                    <td>
+                      <form class="inline-form" method="post" action="{{ url_for('admin_config_delete', cid=c['id']) }}">
+                        <button class="icon-btn danger" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                      </form>
+                      <details class="edit-row"><summary>Изменить</summary>
+                        <form class="edit-box" method="post" action="{{ url_for('admin_config_edit', cid=c['id']) }}">
+                          <div class="form-row">
+                            <div class="field"><label>Название</label><input name="name" value="{{ c['name'] }}"></div>
+                            <div class="field"><label>Тег</label><input name="tag" value="{{ c['tag'] }}"></div>
+                            <div class="field"><label>Цена</label><input type="number" name="price" value="{{ c['price'] }}"></div>
+                            <div class="field"><label>Иконка</label><input name="icon" value="{{ c['icon'] }}"></div>
+                            <div class="field"><label>CPU</label><input name="cpu" value="{{ c['cpu'] }}"></div>
+                            <div class="field"><label>GPU</label><input name="gpu" value="{{ c['gpu'] }}"></div>
+                            <div class="field"><label>RAM</label><input name="ram" value="{{ c['ram'] }}"></div>
+                            <div class="field"><label>Накопитель</label><input name="storage" value="{{ c['storage'] }}"></div>
+                          </div>
+                          <button class="btn btn-primary btn-sm">Сохранить</button>
+                        </form>
+                      </details>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ПЕРИФЕРИЯ ===== -->
+        <div class="admin-panel {{ 'active' if tab=='peripherals' }}" data-panel="peripherals">
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-plus"></i> Новая периферия</h3>
+            <form method="post" action="{{ url_for('admin_peripheral_add') }}">
+              <div class="form-row">
+                <div class="field"><label>Название</label><input name="name" required></div>
+                <div class="field"><label>Категория</label><input name="category" placeholder="Мыши"></div>
+                <div class="field"><label>Бейдж</label><input name="badge" placeholder="ТОП"></div>
+                <div class="field"><label>Иконка</label><input name="icon" placeholder="fa-keyboard"></div>
+              </div>
+              <div class="field"><label>Описание</label><input name="descr"></div>
+              <div class="field"><label>Характеристики (через |)</label><input name="specs" placeholder="63г|2 кГц|95ч"></div>
+              <button class="btn btn-primary btn-sm">Добавить</button>
+            </form>
+          </div>
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-keyboard"></i> Периферия</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Название</th><th>Категория</th><th>Бейдж</th><th>Действия</th></tr></thead>
+                <tbody>
+                  {% for p in peripherals %}
+                  <tr>
+                    <td>{{ p['name'] }}</td><td>{{ p['category'] }}</td><td>{{ p['badge'] }}</td>
+                    <td>
+                      <form class="inline-form" method="post" action="{{ url_for('admin_peripheral_delete', pid=p['id']) }}">
+                        <button class="icon-btn danger" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                      </form>
+                      <details class="edit-row"><summary>Изменить</summary>
+                        <form class="edit-box" method="post" action="{{ url_for('admin_peripheral_edit', pid=p['id']) }}">
+                          <div class="form-row">
+                            <div class="field"><label>Название</label><input name="name" value="{{ p['name'] }}"></div>
+                            <div class="field"><label>Категория</label><input name="category" value="{{ p['category'] }}"></div>
+                            <div class="field"><label>Бейдж</label><input name="badge" value="{{ p['badge'] }}"></div>
+                            <div class="field"><label>Иконка</label><input name="icon" value="{{ p['icon'] }}"></div>
+                          </div>
+                          <div class="field"><label>Описание</label><input name="descr" value="{{ p['descr'] }}"></div>
+                          <div class="field"><label>Характеристики</label><input name="specs" value="{{ p['specs'] }}"></div>
+                          <button class="btn btn-primary btn-sm">Сохранить</button>
+                        </form>
+                      </details>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ИГРЫ ===== -->
+        <div class="admin-panel {{ 'active' if tab=='games' }}" data-panel="games">
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-plus"></i> Новая игра</h3>
+            <form method="post" action="{{ url_for('admin_game_add') }}">
+              <div class="form-row">
+                <div class="field"><label>Название</label><input name="name" required></div>
+                <div class="field"><label>Жанр</label><input name="genre" placeholder="Шутер"></div>
+                <div class="field"><label>Иконка</label><input name="icon" placeholder="fa-gamepad"></div>
+              </div>
+              <button class="btn btn-primary btn-sm">Добавить</button>
+            </form>
+          </div>
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-gamepad"></i> Игры</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Название</th><th>Жанр</th><th>Действия</th></tr></thead>
+                <tbody>
+                  {% for g in games %}
+                  <tr>
+                    <td>{{ g['name'] }}</td><td>{{ g['genre'] }}</td>
+                    <td>
+                      <form class="inline-form" method="post" action="{{ url_for('admin_game_delete', gid=g['id']) }}">
+                        <button class="icon-btn danger" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                      </form>
+                      <details class="edit-row"><summary>Изменить</summary>
+                        <form class="edit-box" method="post" action="{{ url_for('admin_game_edit', gid=g['id']) }}">
+                          <div class="form-row">
+                            <div class="field"><label>Название</label><input name="name" value="{{ g['name'] }}"></div>
+                            <div class="field"><label>Жанр</label><input name="genre" value="{{ g['genre'] }}"></div>
+                            <div class="field"><label>Иконка</label><input name="icon" value="{{ g['icon'] }}"></div>
+                          </div>
+                          <button class="btn btn-primary btn-sm">Сохранить</button>
+                        </form>
+                      </details>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== НАСТРОЙКИ САЙТА ===== -->
+        <div class="admin-panel {{ 'active' if tab=='settings' }}" data-panel="settings">
+          <div class="panel-block">
+            <h3><i class="fa-solid fa-sliders"></i> Тексты и контакты сайта</h3>
+            <p style="color:var(--muted);margin-bottom:18px;font-size:.9rem">Меняй любой текст на сайте — заголовки, описания, статистику, контакты и соцсети. Всё хранится в БД.</p>
+            <form method="post" action="{{ url_for('admin_settings') }}">
+              <div class="form-row">
+                {% for row in settings_rows %}
+                <div class="field" {{ 'style=grid-column:1/-1' if row['key']=='about_text' or row['key']=='hero_subtitle' }}>
+                  <label>{{ labels.get(row['key'], row['key']) }}</label>
+                  {% if row['key'] in ['about_text','hero_subtitle'] %}
+                  <textarea name="set_{{ row['key'] }}">{{ row['value'] }}</textarea>
+                  {% else %}
+                  <input name="set_{{ row['key'] }}" value="{{ row['value'] }}">
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+              <button class="btn btn-white btn-sm mt-1"><i class="fa-solid fa-floppy-disk"></i> Сохранить настройки</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Конфигурации{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Игровые ПК</span>
+      <h2>Конфигурации</h2>
+      <p>Выбери сборку, укажи количество часов — стоимость рассчитается мгновенно.</p>
+    </div>
+
+    <div class="grid grid-3">
+      {% for c in configs %}
+      <div class="card config-card reveal d{{ (loop.index0 % 3) + 1 }}" data-booking data-price="{{ c['price'] }}">
+        <span class="top-line"></span>
+        <span class="tag">{{ c['tag'] }}</span>
+        <div class="ic"><i class="fa-solid {{ c['icon'] }}"></i></div>
+        <h3>{{ c['name'] }}</h3>
+        <div class="price">{{ c['price'] }} ₽ <small>/ час</small></div>
+
+        <ul class="specs">
+          <li><i class="fa-solid fa-microchip"></i>{{ c['cpu'] }}</li>
+          <li><i class="fa-solid fa-display"></i>{{ c['gpu'] }}</li>
+          <li><i class="fa-solid fa-memory"></i>{{ c['ram'] }}</li>
+          <li><i class="fa-solid fa-hard-drive"></i>{{ c['storage'] }}</li>
+        </ul>
+
+        {% if session.get('user_id') %}
+          <button type="button" class="btn btn-primary btn-block booking-trigger">
+            <i class="fa-solid fa-calendar-check"></i> <span>Забронировать</span>
+          </button>
+          <form method="post" action="{{ url_for('book') }}" class="booking">
+            <input type="hidden" name="config_id" value="{{ c['id'] }}">
+            <label style="color:var(--muted);font-size:.82rem">Количество часов</label>
+            <div class="stepper">
+              <button type="button" class="step-dec" aria-label="−">−</button>
+              <input class="hours-input" type="number" name="hours" value="2" min="1" max="24">
+              <button type="button" class="step-inc" aria-label="+">+</button>
+              <span class="hours-lbl"></span>
+            </div>
+            <div class="live-total">
+              <span style="color:var(--muted)">Итого:</span>
+              <b class="total-val">0 ₽</b>
+            </div>
+            <button type="submit" class="btn btn-white btn-block">
+              <i class="fa-solid fa-bolt"></i> Подтвердить бронь
+            </button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-ghost btn-block">
+            <i class="fa-solid fa-lock"></i> Войдите для брони
+          </a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

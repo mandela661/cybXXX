@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-orb a"></div>
+  <div class="hero-orb b"></div>
+  <div class="container">
+    <span class="hero-kicker">{{ settings.hero_kicker }}</span>
+    <h1>
+      {% set words = settings.hero_title.split(' ') %}
+      {% for w in words %}<span class="{{ 'accent' if loop.last }}">{{ w }}</span>{{ ' ' if not loop.last }}{% endfor %}
+    </h1>
+    <p>{{ settings.hero_subtitle }}</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('configs') }}" class="btn btn-primary"><i class="fa-solid fa-bolt"></i> Забронировать ПК</a>
+      <a href="{{ url_for('games') }}" class="btn btn-ghost"><i class="fa-solid fa-gamepad"></i> Каталог игр</a>
+    </div>
+  </div>
+  <!-- линия во всю ширину экрана -->
+  <div class="hero-line"></div>
+</section>
+
+<!-- ===== О НАС ===== -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2>{{ settings.about_title }}</h2>
+      <p>{{ settings.about_text }}</p>
+    </div>
+
+    <div class="about-grid">
+      {% set advantages = [
+        ('fa-microchip','Топовое железо','RTX 4090, Core i9 и 64 ГБ DDR5 — любая игра на ультра-настройках без компромиссов.'),
+        ('fa-gauge-high','Мониторы 360 Гц','Профессиональные дисплеи 1440p с G-SYNC. Каждый кадр имеет значение.'),
+        ('fa-wifi','Минимальный пинг','Оптоволокно и оптимизированная сеть — стабильное соединение для любого матча.'),
+        ('fa-chair','Комфорт','Кресла Secretlab, продуманная эргономика и атмосфера для долгих сессий.'),
+        ('fa-shield-halved','Чистота и сервис','Регулярная санобработка техники и поддержка администратора 24/7.'),
+        ('fa-trophy','Турниры','Регулярные турниры по CS2 и Dota 2 с реальным призовым фондом.'),
+        ('fa-bolt','Быстрый старт','Бронируй место онлайн за минуту — без очередей и звонков.'),
+        ('fa-headset','Премиум-периферия','Razer, Logitech, SteelSeries — только проверенные устройства.')
+      ] %}
+      {% for ic, t, d in advantages %}
+      <div class="card reveal d{{ (loop.index0 % 4) + 1 }}">
+        <span class="top-line"></span>
+        <div class="ic"><i class="fa-solid {{ ic }}"></i></div>
+        <h3>{{ t }}</h3>
+        <p>{{ d }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== СТАТИСТИКА ===== -->
+<section class="section-sm">
+  <div class="container">
+    <div class="stats">
+      <div class="stat reveal d1"><div class="num"><span data-count="{{ settings.stat_pc }}">0</span><b>+</b></div><div class="lbl">Игровых ПК</div></div>
+      <div class="stat reveal d2"><div class="num">{{ settings.stat_hours }}</div><div class="lbl">Режим работы</div></div>
+      <div class="stat reveal d3"><div class="num"><span data-count="{{ settings.stat_years }}">0</span></div><div class="lbl">Лет на рынке</div></div>
+      <div class="stat reveal d4"><div class="num"><span data-count="{{ settings.stat_players }}">0</span><b>+</b></div><div class="lbl">Игроков с нами</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== КОНФИГУРАЦИИ (превью) ===== -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Тарифы</span>
+      <h2>Выбери свою машину</h2>
+      <p>Три уровня под любые задачи — от киберспорта до стриминга в 4K.</p>
+    </div>
+    <div class="grid grid-3">
+      {% for c in configs %}
+      <div class="card config-card reveal d{{ loop.index }}">
+        <span class="top-line"></span>
+        <span class="tag">{{ c['tag'] }}</span>
+        <div class="ic"><i class="fa-solid {{ c['icon'] }}"></i></div>
+        <h3>{{ c['name'] }}</h3>
+        <div class="price">{{ c['price'] }} ₽ <small>/ час</small></div>
+        <ul class="specs">
+          <li><i class="fa-solid fa-microchip"></i>{{ c['gpu'] }}</li>
+          <li><i class="fa-solid fa-memory"></i>{{ c['ram'] }}</li>
+        </ul>
+        <a href="{{ url_for('configs') }}" class="btn btn-primary btn-block">Подробнее</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== КАК ЭТО РАБОТАЕТ ===== -->
+<section class="section-sm">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Просто</span>
+      <h2>Как начать играть</h2>
+    </div>
+    <div class="grid grid-4">
+      {% set steps = [
+        ('01','Зарегистрируйся','Создай аккаунт за минуту и пополни баланс.'),
+        ('02','Выбери ПК','Подбери конфигурацию под свою игру и бюджет.'),
+        ('03','Забронируй','Укажи количество часов — сумма посчитается сразу.'),
+        ('04','Побеждай','Приходи в клуб и выкладывайся на максимум.')
+      ] %}
+      {% for n, t, d in steps %}
+      <div class="card reveal d{{ loop.index }}">
+        <div class="price text-red" style="font-family:var(--font-display);font-size:2rem;font-weight:800">{{ n }}</div>
+        <h3 style="margin-top:8px">{{ t }}</h3>
+        <p>{{ d }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== ОТЗЫВЫ (превью) ===== -->
+{% if reviews %}
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Отзывы</span>
+      <h2>Что говорят игроки</h2>
+    </div>
+    <div class="grid grid-3">
+      {% for r in reviews %}
+      <div class="card review-card reveal d{{ loop.index }}">
+        <div class="stars">{% for i in range(5) %}<i class="fa-solid fa-star {{ 'off' if i >= r['rating'] }}"></i>{% endfor %}</div>
+        <p>«{{ r['text'] }}»</p>
+        <div class="author text-red">— {{ r['author'] }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-2"><a href="{{ url_for('reviews') }}" class="btn btn-ghost">Все отзывы</a></div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ===== АКЦИИ (превью) ===== -->
+{% if promos %}
+<section class="section-sm">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Выгода</span>
+      <h2>Актуальные акции</h2>
+    </div>
+    <div class="grid grid-3">
+      {% for p in promos %}
+      <div class="card promo-card reveal d{{ loop.index }}">
+        <span class="top-line"></span>
+        {% if p['discount'] %}<div class="disc">−{{ p['discount'] }}%</div>{% else %}<div class="ic"><i class="fa-solid fa-gift"></i></div>{% endif %}
+        <h3>{{ p['title'] }}</h3>
+        <p>{{ p['descr'] }}</p>
+        <div class="period"><i class="fa-solid fa-clock"></i> {{ p['period'] }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ===== CTA ===== -->
+<section class="section">
+  <div class="container">
+    <div class="card reveal text-center" style="padding:56px 30px">
+      <span class="top-line"></span>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Готов сыграть?</h2>
+      <p style="color:var(--muted);max-width:520px;margin:14px auto 26px">Регистрация занимает меньше минуты. Первый матч может изменить всё.</p>
+      <a href="{{ url_for('login') }}" class="btn btn-white"><i class="fa-solid fa-bolt"></i> Начать сейчас</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

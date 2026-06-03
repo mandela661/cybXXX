@@ -1,0 +1,22 @@
+# Render Blueprint — авто-деплой при подключении репозитория.
+# https://render.com  →  New +  →  Blueprint  →  выбрать этот репозиторий.
+services:
+  - type: web
+    name: cyberx
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true        # Render сгенерирует секретный ключ сам
+      - key: PYTHON_VERSION
+        value: "3.12.4"
+    # --- Чтобы данные (БД) не сбрасывались при передеплое — раскомментируй
+    #     диск (платный тариф) и переменную DATABASE_PATH:
+    # disk:
+    #   name: cyberx-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    # затем добавь envVar: DATABASE_PATH=/var/data/cyberx.db

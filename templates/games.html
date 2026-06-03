@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Игры{% endblock %}
+{% block content %}
+
+<section class="section" data-filterable>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Каталог</span>
+      <h2>Игры</h2>
+      <p>Более {{ games|length }} тайтлов уже установлены. Фильтруй по жанру или ищи по названию.</p>
+    </div>
+
+    <div class="search-box reveal">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" data-search placeholder="Поиск игры...">
+    </div>
+
+    <div class="filters reveal">
+      <button class="chip active" data-filter="all">Все</button>
+      {% for g in genres %}
+      <button class="chip" data-filter="{{ g }}">{{ g }}</button>
+      {% endfor %}
+    </div>
+
+    <div class="grid grid-4">
+      {% for g in games %}
+      <div class="card game-card reveal" data-tags="{{ g['genre'] }}" data-name="{{ g['name'] }}">
+        <span class="top-line"></span>
+        <div class="ic"><i class="fa-solid {{ g['icon'] }}"></i></div>
+        <h3 style="font-size:1rem">{{ g['name'] }}</h3>
+        <div class="genre">{{ g['genre'] }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="empty-note"><i class="fa-solid fa-ghost"></i> Ничего не найдено</div>
+  </div>
+</section>
+
+{% endblock %}

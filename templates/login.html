@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="container auth-wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Аккаунт</span>
+      <h2>Личный кабинет</h2>
+    </div>
+
+    <div class="auth-card reveal">
+      <div class="auth-tabs">
+        <button data-tab="login" class="active">Вход</button>
+        <button data-tab="register">Регистрация</button>
+      </div>
+
+      <!-- ВХОД -->
+      <form method="post" action="{{ url_for('login') }}" class="auth-form active" data-form="login">
+        <div class="field">
+          <label>Логин</label>
+          <input type="text" name="username" placeholder="admin / demo" required>
+        </div>
+        <div class="field">
+          <label>Пароль</label>
+          <input type="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-white btn-block"><i class="fa-solid fa-bolt"></i> Войти</button>
+        <p style="color:var(--dim);font-size:.8rem;margin-top:14px;text-align:center">
+          Демо: <b class="text-red">admin / admin123</b> · <b class="text-red">demo / demo123</b>
+        </p>
+      </form>
+
+      <!-- РЕГИСТРАЦИЯ -->
+      <form method="post" action="{{ url_for('register') }}" class="auth-form" data-form="register">
+        <div class="field"><label>Логин</label><input type="text" name="username" placeholder="Минимум 3 символа" required></div>
+        <div class="field"><label>Email</label><input type="email" name="email" placeholder="you@mail.ru" required></div>
+        <div class="field"><label>Телефон</label><input type="tel" name="phone" placeholder="+7 (___) ___-__-__"></div>
+        <div class="field"><label>Пароль</label><input type="password" name="password" placeholder="Минимум 6 символов" required></div>
+        <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-user-plus"></i> Создать аккаунт</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

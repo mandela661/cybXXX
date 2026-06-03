@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Кабинет{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="container">
+    <div class="cab-head reveal">
+      <div>
+        <span class="eyebrow text-red" style="font-family:var(--font-display);letter-spacing:3px;font-size:.74rem">КАБИНЕТ</span>
+        <h2 style="font-size:2rem">Привет, {{ user['username'] }}</h2>
+        <p style="color:var(--muted)">{{ user['email'] }} · {{ user['phone'] or '—' }}</p>
+      </div>
+      <div class="balance-pill"><i class="fa-solid fa-wallet text-red"></i> Баланс: <b>{{ user['balance'] }} ₽</b></div>
+    </div>
+
+    <div class="grid grid-3 mb-2">
+      <div class="stat reveal d1"><div class="num"><span data-count="{{ bookings|length }}">0</span></div><div class="lbl">Бронирований</div></div>
+      <div class="stat reveal d2"><div class="num"><span data-count="{{ total_hours }}">0</span></div><div class="lbl">Часов всего</div></div>
+      <div class="stat reveal d3"><div class="num"><span data-count="{{ total_spent }}">0</span><b> ₽</b></div><div class="lbl">Потрачено</div></div>
+    </div>
+
+    <div class="grid grid-2" style="align-items:start">
+      <!-- пополнение -->
+      <div class="card reveal">
+        <h3 style="margin-bottom:16px"><i class="fa-solid fa-plus text-red"></i> Пополнить баланс</h3>
+        <form method="post" action="{{ url_for('topup') }}">
+          <div class="filters" style="justify-content:flex-start;margin-bottom:16px">
+            {% for a in [100,250,500,1000] %}
+            <button type="button" class="chip" onclick="document.getElementById('amt').value={{ a }}">+{{ a }} ₽</button>
+            {% endfor %}
+          </div>
+          <div class="field"><input id="amt" type="number" name="amount" min="1" placeholder="Сумма, ₽" required></div>
+          <button type="submit" class="btn btn-white btn-block"><i class="fa-solid fa-bolt"></i> Пополнить</button>
+        </form>
+      </div>
+
+      <!-- история -->
+      <div class="card reveal d2">
+        <h3 style="margin-bottom:16px"><i class="fa-solid fa-clock-rotate-left text-red"></i> История бронирований</h3>
+        {% if bookings %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ПК</th><th>Часы</th><th>Сумма</th><th>Статус</th><th>Дата</th></tr></thead>
+            <tbody>
+              {% for b in bookings %}
+              <tr>
+                <td>{{ b['config_name'] }}</td>
+                <td>{{ b['hours'] }}</td>
+                <td>{{ b['total'] }} ₽</td>
+                <td><span class="status {{ b['status'] }}">{{ b['status'] }}</span></td>
+                <td style="color:var(--dim)">{{ b['created_at'][:16] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p style="color:var(--dim)">Бронирований пока нет. <a href="{{ url_for('configs') }}" class="text-red">Забронировать ПК →</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

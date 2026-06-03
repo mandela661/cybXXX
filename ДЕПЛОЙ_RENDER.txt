@@ -1,0 +1,56 @@
+ДЕПЛОЙ НА RENDER — пошагово
+===========================
+
+Я подготовил всё для деплоя (gunicorn, render.yaml, Procfile, runtime.txt),
+но сам выложить проект не могу: для этого нужен доступ к твоему аккаунту
+GitHub и Render. Поэтому ниже — точные шаги, занимает ~5 минут.
+
+ПОДГОТОВКА
+1. Скопируй содержимое папки cyberX поверх своего репозитория
+   (app.py, render.yaml, Procfile, runtime.txt, requirements.txt,
+    templates/, static/ должны лежать в КОРНЕ репозитория — там же,
+    где app.py).
+2. Убедись, что в .gitignore есть строки (чтобы не залить лишнее):
+       __pycache__/
+       *.pyc
+       .venv/
+       cyberx.db
+       .env
+3. Закоммить и запушь в GitHub:
+       git add .
+       git commit -m "redesign + render deploy"
+       git push
+
+ВАРИАНТ A — через Blueprint (проще, использует render.yaml)
+1. Зайди на https://render.com  и войди через GitHub.
+2. Кнопка "New +"  →  "Blueprint".
+3. Выбери свой репозиторий cybXx  →  Render сам прочитает render.yaml.
+4. Нажми "Apply" / "Create".  Через пару минут будет ссылка вида
+   https://cyberx.onrender.com
+
+ВАРИАНТ B — вручную (Web Service)
+1. "New +"  →  "Web Service"  →  подключи репозиторий cybXx.
+2. Заполни:
+       Runtime / Language : Python
+       Build Command      : pip install -r requirements.txt
+       Start Command      : gunicorn app:app --bind 0.0.0.0:$PORT
+       Instance Type      : Free
+3. (необязательно) Environment  →  Add Environment Variable:
+       SECRET_KEY  =  любой длинный случайный набор символов
+4. "Create Web Service".
+
+ВАЖНО ПРО БАЗУ ДАННЫХ
+- На бесплатном тарифе файловая система временная: при каждом передеплое
+  или "засыпании" сервиса база cyberx.db создаётся заново из стартовых
+  данных (демо-логины admin/admin123 и demo/demo123 будут работать).
+- Чтобы данные сохранялись постоянно, нужен платный диск (Disk):
+  раскомментируй блок "disk:" в render.yaml, добавь переменную
+  DATABASE_PATH=/var/data/cyberx.db — приложение умеет брать путь к БД
+  из этой переменной.
+- Бесплатный сервис "засыпает" после 15 минут простоя и просыпается
+  на первом запросе (10–30 сек). Это нормально для демо.
+
+ПРОВЕРКА ЛОКАЛЬНО (по желанию)
+       pip install -r requirements.txt
+       gunicorn app:app --bind 0.0.0.0:8000
+   и открой http://127.0.0.1:8000

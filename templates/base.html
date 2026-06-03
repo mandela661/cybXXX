@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ settings.site_title }}{% endblock %} — {{ settings.site_title }}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body{% if open_tab %} data-open-tab="{{ open_tab }}"{% endif %}>
+
+  <!-- загрузчик -->
+  <div id="loader">
+    <div class="loader-inner">
+      <div class="loader-logo">CYBER<span>X</span></div>
+      <div class="loader-bar"><i></i></div>
+    </div>
+  </div>
+
+  <!-- кастомный курсор -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- flash -->
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+      <div class="flash-wrap">
+        {% for cat, msg in msgs %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- шапка -->
+  <header class="header">
+    <div class="container nav">
+      <a href="{{ url_for('index') }}" class="brand">CYBER<b>X</b></a>
+      <nav class="nav-links">
+        <a href="{{ url_for('index') }}"       class="{{ 'active' if active=='index' }}">Главная</a>
+        <a href="{{ url_for('configs') }}"     class="{{ 'active' if active=='configs' }}">Конфигурации</a>
+        <a href="{{ url_for('peripherals') }}" class="{{ 'active' if active=='peripherals' }}">Периферия</a>
+        <a href="{{ url_for('games') }}"       class="{{ 'active' if active=='games' }}">Игры</a>
+        <a href="{{ url_for('promotions') }}"  class="{{ 'active' if active=='promotions' }}">Акции</a>
+        <a href="{{ url_for('reviews') }}"     class="{{ 'active' if active=='reviews' }}">Отзывы</a>
+        <a href="{{ url_for('contacts') }}"    class="{{ 'active' if active=='contacts' }}">Контакты</a>
+      </nav>
+      <div class="nav-actions">
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('admin' if session.get('role')=='admin' else 'cabinet') }}" class="btn btn-ghost btn-sm">
+            <i class="fa-solid fa-user"></i> {{ session.get('username') }}
+          </a>
+          <a href="{{ url_for('logout') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-right-from-bracket"></i></a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-white btn-sm"><i class="fa-solid fa-bolt"></i> Вход</a>
+        {% endif %}
+        <button class="burger" aria-label="Меню"><i class="fa-solid fa-bars"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- футер -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="{{ url_for('index') }}" class="brand">CYBER<b>X</b></a>
+        <p style="color:var(--muted); margin-top:14px; max-width:300px;">{{ settings.hero_subtitle }}</p>
+        <div class="socials">
+          <a href="{{ settings.social_tg }}"  target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i></a>
+          <a href="{{ settings.social_vk }}"  target="_blank" rel="noopener"><i class="fa-brands fa-vk"></i></a>
+          <a href="{{ settings.social_dis }}" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4>Навигация</h4>
+        <a href="{{ url_for('configs') }}">Конфигурации</a>
+        <a href="{{ url_for('peripherals') }}">Периферия</a>
+        <a href="{{ url_for('games') }}">Игры</a>
+        <a href="{{ url_for('promotions') }}">Акции</a>
+      </div>
+      <div>
+        <h4>Клуб</h4>
+        <a href="{{ url_for('reviews') }}">Отзывы</a>
+        <a href="{{ url_for('contacts') }}">Контакты</a>
+        <a href="{{ url_for('login') }}">Личный кабинет</a>
+      </div>
+      <div>
+        <h4>Контакты</h4>
+        <a href="tel:{{ settings.contact_phone }}"><i class="fa-solid fa-phone"></i> {{ settings.contact_phone }}</a>
+        <a href="mailto:{{ settings.contact_email }}"><i class="fa-solid fa-envelope"></i> {{ settings.contact_email }}</a>
+        <a><i class="fa-solid fa-location-dot"></i> {{ settings.contact_address }}</a>
+        <a><i class="fa-solid fa-clock"></i> {{ settings.contact_hours }}</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">© {{ current_year }} {{ settings.site_title }}. Все права защищены.</div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

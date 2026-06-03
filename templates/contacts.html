@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Контакты{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+{% endblock %}
+
+{% block content %}
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Связь</span>
+      <h2>Контакты</h2>
+      <p>Есть вопрос? Мы на связи круглосуточно.</p>
+    </div>
+
+    <div class="grid grid-4">
+      <a href="tel:{{ settings.contact_phone }}" class="card reveal d1">
+        <span class="top-line"></span>
+        <div class="ic"><i class="fa-solid fa-phone"></i></div>
+        <h3>Телефон</h3><p>{{ settings.contact_phone }}</p>
+      </a>
+      <a href="mailto:{{ settings.contact_email }}" class="card reveal d2">
+        <span class="top-line"></span>
+        <div class="ic"><i class="fa-solid fa-envelope"></i></div>
+        <h3>Email</h3><p>{{ settings.contact_email }}</p>
+      </a>
+      <div class="card reveal d3">
+        <span class="top-line"></span>
+        <div class="ic"><i class="fa-solid fa-location-dot"></i></div>
+        <h3>Адрес</h3><p>{{ settings.contact_address }}</p>
+      </div>
+      <div class="card reveal d4">
+        <span class="top-line"></span>
+        <div class="ic"><i class="fa-solid fa-clock"></i></div>
+        <h3>Часы работы</h3><p>{{ settings.contact_hours }}</p>
+      </div>
+    </div>
+
+    <div class="text-center mt-2">
+      <div class="socials" style="justify-content:center">
+        <a href="{{ settings.social_tg }}"  target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i></a>
+        <a href="{{ settings.social_vk }}"  target="_blank" rel="noopener"><i class="fa-brands fa-vk"></i></a>
+        <a href="{{ settings.social_dis }}" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i></a>
+      </div>
+    </div>
+
+    <div class="map-wrap reveal">
+      <div id="map"
+           data-lat="{{ settings.map_lat }}"
+           data-lng="{{ settings.map_lng }}"
+           data-zoom="{{ settings.map_zoom }}"
+           data-address="{{ settings.contact_address }}"
+           data-title="{{ settings.site_title }}"></div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  (function () {
+    var el = document.getElementById('map');
+    if (!el || typeof L === 'undefined') return;
+    var lat = parseFloat(el.dataset.lat) || 55.7558;
+    var lng = parseFloat(el.dataset.lng) || 37.6173;
+    var zoom = parseInt(el.dataset.zoom, 10) || 15;
+
+    var map = L.map(el, { scrollWheelZoom: false, attributionControl: true }).setView([lat, lng], zoom);
+    map.on('click', function () { map.scrollWheelZoom.enable(); });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO',
+      subdomains: 'abcd', maxZoom: 20
+    }).addTo(map);
+
+    var icon = L.divIcon({ className: '', html: '<div class="map-pin"></div>', iconSize: [22, 22], iconAnchor: [11, 22] });
+    L.marker([lat, lng], { icon: icon }).addTo(map)
+      .bindPopup('<b>' + el.dataset.title + '</b><br>' + el.dataset.address)
+      .openPopup();
+  })();
+</script>
+{% endblock %}

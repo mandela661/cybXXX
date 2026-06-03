@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Отзывы{% endblock %}
+{% block content %}
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Сообщество</span>
+      <h2>Отзывы</h2>
+      <div class="avg-badge"><i class="fa-solid fa-star text-red"></i> <b>{{ '%.1f'|format(avg) }}</b> / 5</div>
+    </div>
+
+    {% if reviews %}
+    <div class="grid grid-3 mb-2">
+      {% for r in reviews %}
+      <div class="card review-card reveal d{{ (loop.index0 % 3) + 1 }}">
+        <span class="top-line"></span>
+        <div class="stars">{% for i in range(5) %}<i class="fa-solid fa-star {{ 'off' if i >= r['rating'] }}"></i>{% endfor %}</div>
+        <p>«{{ r['text'] }}»</p>
+        <div class="author text-red">— {{ r['author'] }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="auth-wrap mt-2">
+      <div class="auth-card reveal">
+        <h3 style="margin-bottom:18px">Оставить отзыв</h3>
+        <form method="post" action="{{ url_for('add_review') }}">
+          {% if not session.get('user_id') %}
+          <div class="field">
+            <label>Ваше имя</label>
+            <input type="text" name="author" placeholder="Имя" required>
+          </div>
+          {% endif %}
+          <div class="field">
+            <label>Оценка</label>
+            <div data-rating-input data-val="5" class="stars" style="font-size:1.5rem;cursor:pointer">
+              {% for i in range(5) %}<i class="fa-solid fa-star"></i>{% endfor %}
+            </div>
+            <input type="hidden" name="rating" value="5">
+          </div>
+          <div class="field">
+            <label>Отзыв</label>
+            <textarea name="text" placeholder="Поделитесь впечатлениями (минимум 10 символов)..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-paper-plane"></i> Отправить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
