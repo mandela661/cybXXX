@@ -90,6 +90,9 @@
         <a href="{{ url_for('reviews') }}">Отзывы</a>
         <a href="{{ url_for('contacts') }}">Контакты</a>
         <a href="{{ url_for('login') }}">Личный кабинет</a>
+  <a href="{{ url_for('privacy') }}">Политика конфиденциальности</a>
+  <a href="{{ url_for('personal_data') }}">Согласие на обработку данных</a>
+  <a href="{{ url_for('cookies_policy') }}">Файлы cookie</a>
       </div>
       <div>
         <h4>Контакты</h4>
@@ -102,7 +105,21 @@
     <div class="container footer-bottom">© {{ current_year }} {{ settings.site_title }}. Все права защищены.</div>
   </footer>
 
+
+
+  <div class="cookie-consent" data-cookie-consent hidden>
+    <div>
+      <b><i class="fa-solid fa-cookie-bite"></i> Мы используем cookie</b>
+      <p>Cookie нужны для входа в аккаунт, работы сессии и улучшения интерфейса сайта.</p>
+    </div>
+    <div class="cookie-consent__actions">
+      <a href="{{ url_for('cookies_policy') }}" class="btn btn-ghost btn-sm">Подробнее</a>
+      <button type="button" class="btn btn-primary btn-sm" data-cookie-accept>Принять</button>
+    </div>
+  </div>
+
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/cookie-consent.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

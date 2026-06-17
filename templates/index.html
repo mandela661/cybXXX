@@ -42,13 +42,51 @@
         ('fa-headset','Премиум-периферия','Razer, Logitech, SteelSeries — только проверенные устройства.')
       ] %}
       {% for ic, t, d in advantages %}
-      <div class="card reveal d{{ (loop.index0 % 4) + 1 }}">
+
+  <button type="button" class="flip-card reveal d{{ (loop.index0 % 4) + 1 }}" aria-label="Подробнее: {{ t }}">
+    <span class="flip-card__hint">Нажми</span>
+    <span class="flip-card__inner">
+      <span class="flip-card__face flip-card__front">
         <span class="top-line"></span>
-        <div class="ic"><i class="fa-solid {{ ic }}"></i></div>
-        <h3>{{ t }}</h3>
-        <p>{{ d }}</p>
-      </div>
-      {% endfor %}
+        <span class="ic"><i class="fa-solid {{ ic }}"></i></span>
+        <span class="flip-card__title">{{ t }}</span>
+        <span class="flip-card__text">{{ d }}</span>
+      </span>
+      <span class="flip-card__face flip-card__back">
+        <span class="top-line"></span>
+        <span class="flip-card__title">Подробнее</span>
+        <span class="flip-card__text">
+          {{ t }} — часть клубного стандарта CyberX. Мы регулярно обновляем оборудование,
+          следим за состоянием игровых мест и помогаем игрокам быстрее включаться в матч.
+        </span>
+        <span class="flip-card__more">Нажми ещё раз, чтобы вернуться</span>
+      </span>
+    </span>
+  </button>
+
+  {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ===== ВИЗУАЛЫ КЛУБА ===== -->
+<section class="section-sm gaming-visuals">
+  <div class="container">
+    <div class="grid grid-3">
+      <figure class="visual-card reveal d1">
+        <img src="{{ url_for('static', filename='images/club-arena.svg') }}" alt="Игровая зона CyberX">
+        <figcaption>Атмосферная игровая зона с неоновой подсветкой</figcaption>
+      </figure>
+      <figure class="visual-card reveal d2">
+        <img src="{{ url_for('static', filename='images/gaming-pc.svg') }}" alt="Игровой ПК CyberX">
+        <figcaption>Мощные ПК для шутеров, MOBA и стриминга</figcaption>
+      </figure>
+      <figure class="visual-card reveal d3">
+        <img src="{{ url_for('static', filename='images/esports-stats.svg') }}" alt="Статистика игрока CyberX">
+        <figcaption>Профиль, достижения и прогресс игрока</figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -70,7 +108,7 @@
   <div class="container">
     <div class="section-head reveal">
       <span class="eyebrow">Тарифы</span>
-      <h2>Выбери свою машину</h2>
+      <h2>Выбери свой ПК</h2>
       <p>Три уровня под любые задачи — от киберспорта до стриминга в 4K.</p>
     </div>
     <div class="grid grid-3">

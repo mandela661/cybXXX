@@ -174,3 +174,25 @@ document.addEventListener("DOMContentLoaded", () => {
     paint(5);
   }
 });
+
+
+// ===== CyberX update: flip cards and game profile cards =====
+(() => {
+  document.querySelectorAll('.flip-card').forEach((card) => {
+    card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        card.classList.toggle('is-flipped');
+      }
+    });
+  });
+
+  document.querySelectorAll('.game-stat-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('is-open');
+      card.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+})();
+
